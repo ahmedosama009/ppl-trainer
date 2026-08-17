@@ -14,7 +14,13 @@ const AR_MON = ['يناير', 'فبراير', 'مارس', 'أبريل', 'ماي�
 let S = load();
 
 function blank() {
-  return { v: 2, pos: 0, week: 1, cycle: 1, sid: 1, cur: null, history: [], body: [], tests: [], ui: {}, profile: {} };
+  return {
+    v: 2, pos: 0, week: 1, cycle: 1, sid: 1, cur: null,
+    history: [], body: [], tests: [], ui: {}, profile: {},
+    /* معرّف الجهاز — بيخلي كل جلسة ليها مفتاح فريد وقت الدمج بين الأجهزة */
+    device: Math.random().toString(36).slice(2, 8),
+    updatedAt: 0
+  };
 }
 /* قيمة من «بياناتي» — بترجع '—' لو لسه مسجّلتهاش */
 function P(k, unit) {
@@ -31,8 +37,10 @@ function load() {
   return blank();
 }
 function save() {
+  S.updatedAt = Date.now();
   try { localStorage.setItem(LS, JSON.stringify(S)); }
   catch (e) { toast('مساحة التخزين امتلت — صدّر نسخة احتياطية'); }
+  if (typeof Sync !== 'undefined' && Sync.user) Sync.push();
 }
 
 /* ---------- أدوات ---------- */
@@ -54,8 +62,10 @@ function sessByKey(k) { return SESSIONS.find(s => s.k === k); }
 /* ---------- الجلسة الحالية ---------- */
 function ensureCur() {
   if (S.cur && S.cur.k === ORDER[S.pos]) return S.cur;
+  const sid = S.sid++;
   S.cur = {
-    sid: S.sid++, k: ORDER[S.pos], week: S.week, cycle: S.cycle,
+    sid: sid, key: (S.device || '?') + '-' + sid, dev: S.device,
+    k: ORDER[S.pos], week: S.week, cycle: S.cycle,
     date: today(), ex: {}, warm: {}, note: '', energy: '', cardio: false, cd: {}
   };
   save();
@@ -105,11 +115,12 @@ function historyOf(exId) {
     const e = r.ex && r.ex[exId];
     if (!e || !e.sets) return;
     const done = e.sets.filter(s => s && +s.r > 0);
-    if (done.length) out.push({ date: r.date, sid: r.sid, week: r.week, sets: done });
+    if (done.length) out.push({ date: r.date, sid: r.sid, key: r.key, week: r.week, sets: done });
   };
   S.history.forEach(scan);
   if (S.cur) scan(S.cur);
-  return out.sort((a, b) => b.sid - a.sid);
+  /* الأحدث الأول — بالتاريخ ثم بالترتيب، عشان السجلات الجاية من جهاز تاني تترتب صح */
+  return out.sort((a, b) => a.date === b.date ? (b.sid || 0) - (a.sid || 0) : (a.date < b.date ? 1 : -1));
 }
 
 /* ---------- محرّك التدرّج المزدوج ---------- */
@@ -117,7 +128,7 @@ function suggest(exId, week) {
   const ex = EX[exId], H = historyOf(exId), W = WEEKS[week - 1];
   const unit = ex.u === 'sec' ? 'ثانية' : ex.u === 'm' ? 'متر' : 'عدة';
   const R = { w: null, reps: ex.lo, msg: '', last: null, icon: '◆' };
-  const prev = H.filter(h => !S.cur || h.sid !== S.cur.sid);
+  const prev = H.filter(h => !S.cur || h.key !== S.cur.key);
 
   if (!prev.length) {
     R.msg = ex.bw
@@ -173,7 +184,7 @@ function setLine(ex, sets) {
   return sets.map(s => (+s.w ? s.w + '×' : '') + s.r + u).join(' · ');
 }
 function lastLine(exId) {
-  const H = historyOf(exId).filter(h => !S.cur || h.sid !== S.cur.sid);
+  const H = historyOf(exId).filter(h => !S.cur || h.key !== S.cur.key);
   if (!H.length) return '';
   return `آخر مرة (${fmt(H[0].date)}): ` + setLine(EX[exId], H[0].sets);
 }
@@ -659,6 +670,29 @@ function viewRef() {
     `<div class="note g">الخلاصة: الخطة مغطية الجسم بالكامل من غير فجوات.</div>`, 10);
   h += `</div>`;
 
+  /* المزامنة */
+  if (typeof Sync !== 'undefined' && Sync.available()) {
+    const u = Sync.user, st = Sync.status;
+    h += `<div class="sect"><h2>المزامنة</h2></div><div class="card card-p">`;
+    if (u) {
+      h += `<div class="f" style="justify-content:space-between;gap:10px">
+        <div style="min-width:0">
+          <b style="display:block">${esc(u.email || 'مسجّل دخول')}</b>
+          <span class="sub"><span class="syncdot ${st.state}" id="syncbadge"></span> ${esc(st.msg)}</span>
+        </div>
+        <button class="btn" data-syncnow="1" style="flex:none">زامن دلوقتي</button>
+      </div>
+      <div class="exacts" style="margin-top:10px">
+        <button class="btn d" data-signout="1">تسجيل خروج</button>
+      </div>
+      <div class="sub" style="margin-top:9px">سجلاتك بتترفع لحسابك أول ما يبقى في نت. افتح الأداة على أي جهاز وسجّل بنفس الحساب وهتلاقي كل حاجة.</div>`;
+    } else {
+      h += `<button class="btn p" style="width:100%" data-signin="1">تسجيل الدخول بجوجل</button>
+      <div class="sub" style="margin-top:9px">من غير تسجيل دخول الأداة شغّالة عادي — البيانات بتفضل على الجهاز ده بس ومش بتتزامن.</div>`;
+    }
+    h += `</div>`;
+  }
+
   /* بياناتي */
   h += `<div class="sect"><h2>بياناتي</h2></div>
   <div class="note b">الأرقام دي بتتحفظ على الجهاز ده بس — مش بتترفع ولا بتتنشر مع الأداة. منها بتتملّى جداول التغذية ونسبة الدهون.</div>
@@ -695,7 +729,7 @@ function wire() {
   const app = $('#app');
 
   app.onclick = ev => {
-    const t = ev.target.closest('[data-tog],[data-ck],[data-fill],[data-rest],[data-hist],[data-jump],[data-acc],[data-fin],[data-cpy],[data-cardio],[data-warm],[data-addbody],[data-delbody],[data-addtest],[data-deltest],[data-exp],[data-imp],[data-reset]');
+    const t = ev.target.closest('[data-tog],[data-ck],[data-fill],[data-rest],[data-hist],[data-jump],[data-acc],[data-fin],[data-cpy],[data-cardio],[data-warm],[data-addbody],[data-delbody],[data-addtest],[data-deltest],[data-exp],[data-imp],[data-reset],[data-signin],[data-signout],[data-syncnow]');
     if (!t) return;
     const d = t.dataset, c = ensureCur();
 
@@ -773,6 +807,13 @@ function wire() {
       save(); render(); toast('الاختبار اتسجّل'); return;
     }
     if (d.deltest) { S.tests = S.tests.filter(x => x.d !== d.deltest); save(); render(); return; }
+
+    if (d.signin) { Sync.signIn(); return; }
+    if (d.signout) {
+      if (confirm('البيانات هتفضل على الجهاز ده، بس مش هتتزامن تاني لحد ما تسجّل دخول. تمام؟')) Sync.signOut();
+      return;
+    }
+    if (d.syncnow) { toast('بيزامن…'); Sync.pull(true); return; }
 
     if (d.exp) { exportData(); return; }
     if (d.imp) { $('#impf').click(); return; }
@@ -882,3 +923,4 @@ document.addEventListener('click', ev => {
 });
 
 render();
+if (typeof Sync !== 'undefined') Sync.init();

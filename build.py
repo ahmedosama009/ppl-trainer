@@ -87,7 +87,17 @@ def read(name):
         return f.read()
 
 
+FB_CONFIG = {
+    '__FB_API_KEY__':     'AIzaSyB4tLyR7Rf5q7mDqwe-7USxLs6OlL8442U',
+    '__FB_AUTH_DOMAIN__': 'ppl-trainer-ahmed.firebaseapp.com',
+    '__FB_PROJECT_ID__':  'ppl-trainer-ahmed',
+}
+
+VENDOR = ['vendor/firebase-app-compat.js', 'vendor/firebase-auth-compat.js']
+
+
 def assemble(pwa):
+    """pwa=True: نسخة الويب (فيها المزامنة). pwa=False: ملف مستقل من غير مزامنة."""
     html = read('shell.html')
     for token, fname in (('/*__CSS__*/', 'style.css'),
                          ('/*__IMG__*/', 'img-data.js'),
@@ -95,9 +105,20 @@ def assemble(pwa):
                          ('/*__APP__*/', 'app.js')):
         assert token in html, 'missing token ' + token
         html = html.replace(token, read(fname))
-    html = html.replace('<!--__PWA__-->', PWA_HEAD if pwa else '')
+
     if pwa:
+        html = html.replace('/*__VENDOR__*/', '\n'.join(read(v) for v in VENDOR))
+        sync = read('sync.js')
+        for key, val in FB_CONFIG.items():
+            assert key in sync, 'missing config token ' + key
+            sync = sync.replace(key, val)
+        html = html.replace('/*__SYNC__*/', sync)
+        html = html.replace('<!--__PWA__-->', PWA_HEAD)
         html = html.replace('</body>', PWA_TAIL + '\n</body>')
+    else:
+        # الملف المستقل: من غير Firebase — بيشتغل محلي بالكامل
+        html = html.replace('/*__VENDOR__*/', '').replace('/*__SYNC__*/', '')
+        html = html.replace('<!--__PWA__-->', '')
     return html
 
 

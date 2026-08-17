@@ -1,0 +1,19 @@
+rules_version = '2';
+
+/* كل مستخدم بيقرا ويكتب مستنده هو بس — مفيش أي وصول لأي حد تاني.
+   القراءة والكتابة مقفولة تمامًا على الحساب صاحب المستند. */
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{uid} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == uid
+                         && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
+    /* أي حاجة تانية ممنوعة */
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

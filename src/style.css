@@ -205,6 +205,10 @@ h1,h2,h3,h4{margin:0;line-height:1.35}
 .warm .wt span{font-size:12px;color:var(--mut)}
 .warm.on .wt b{color:var(--ok)}
 .lb{font-size:11.5px;color:var(--mut);font-weight:600;display:block;margin-bottom:2px}
+.syncdot{display:inline-block;width:8px;height:8px;border-radius:99px;background:var(--line);margin-inline-end:5px;vertical-align:0}
+.syncdot.ok{background:var(--ok)}
+.syncdot.sync{background:var(--warn)}
+.syncdot.err{background:var(--red)}
 .f{display:flex;gap:8px;align-items:center}
 .f label{font-size:12px;color:var(--mut);font-weight:600;flex:none}
 .inp{
