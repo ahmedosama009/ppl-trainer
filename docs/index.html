@@ -2262,6 +2262,29 @@ function copySummary() {
   navigator.clipboard ? navigator.clipboard.writeText(out).then(() => toast('اتنسخ الملخّص')) : prompt('انسخ:', out);
 }
 
+
+/* ---------- بذرة «بياناتي» من لينك ----------
+   الأرقام بتيجي في جزء الـ hash من الرابط — الجزء ده مبيتبعتش لأي خادم،
+   فبيفضل على الجهاز. بيتقري مرة واحدة وبعدين بيتمسح من شريط العنوان. */
+function seedFromHash() {
+  const m = /[#&]p=([A-Za-z0-9_-]+)/.exec(location.hash || '');
+  if (!m) return false;
+  try {
+    const b64 = m[1].replace(/-/g, '+').replace(/_/g, '/');
+    const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const obj = JSON.parse(new TextDecoder().decode(bytes));
+    const allowed = PROFILE_FIELDS.map(f => f[0]);
+    let n = 0;
+    S.profile = S.profile || {};
+    Object.keys(obj).forEach(k => {
+      if (allowed.includes(k) && obj[k] !== '' && obj[k] != null) { S.profile[k] = obj[k]; n++; }
+    });
+    history.replaceState(null, '', location.pathname + location.search);
+    if (n) { save(); toast(n + ' رقم اتسجّلوا في «بياناتي»'); return true; }
+  } catch (e) { console.warn('seed', e); toast('اللينك مش مقروء'); }
+  return false;
+}
+
 /* ---------- التشغيل ---------- */
 document.addEventListener('click', ev => {
   const n = ev.target.closest('.nav button');
@@ -2271,6 +2294,7 @@ document.addEventListener('click', ev => {
   if (ev.target.closest('#gotoday')) { view = 'today'; render(); return; }
 });
 
+seedFromHash();
 render();
 if (typeof Sync !== 'undefined') Sync.init();
 </script>

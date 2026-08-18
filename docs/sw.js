@@ -1,5 +1,5 @@
 /* كاش أوفلاين — النسخة بتتغيّر مع كل build فيتسحب التحديث لوحده */
-const CACHE = 'ppl-ff76c74fe9';
+const CACHE = 'ppl-6e004a855c';
 const ASSETS = ['./', './index.html', './manifest.webmanifest',
                 './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
