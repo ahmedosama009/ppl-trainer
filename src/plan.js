@@ -391,7 +391,7 @@ const EX = {
           'متسيبش الكوع يتقدّم لقدام']
   },
   'preacher-curl': {
-    n: 'Preacher curl', im: ['pullB', 7], s: 3, lo: 12, hi: 15, inc: 1.5, r: 75,
+    n: 'Preacher curl', im: ['pullB', 7], s: 2, lo: 12, hi: 15, inc: 1.5, r: 75,
     m: ['biceps'],
     cue: ['الإبط ملزوق في أعلى الوسادة',
           'افرد بالكامل تحت بس ببطء — الجزء ده حساس',
@@ -600,10 +600,10 @@ const SESSIONS = [
   {
     k: 'pushA', title: 'Push A', tag: 'ثقيل', type: 'push',
     sub: 'صدر · كتف أمامي وجانبي · ترايسبس. أعلى شدّة في الدورة.',
-    dur: 75,
+    dur: 80,
     warm: ['ext-rot'],
     ex: ['bench', 'incline-db', 'dips', 'db-shoulder-press', 'lateral-raise',
-         'overhead-tri', 'scap-pushup'],
+         'overhead-tri', 'rope-pushdown', 'scap-pushup'],
     cardio: { t: 'إرجومتر UT2', d: '٢٠ دقيقة هادي · ١٨–٢٢ ضربة/دقيقة · تقدر تتكلم', min: 20 },
     notes: ['الترتيب: تسخين ← الحديد ← إرجومتر ٢٠ دقيقة هادي. مفيش بطن في الجلسة دي.']
   },
@@ -648,10 +648,10 @@ const SESSIONS = [
   {
     k: 'pullB', title: 'Pull B', tag: 'حجم', type: 'pull',
     sub: 'عدات أعلى · تنويع في زوايا السحب · بايسبس من زاويتين.',
-    dur: 70,
+    dur: 75,
     warm: [],
     ex: ['neutral-pulldown', 'seated-cable-row', 'one-arm-db-row', 'straight-arm-pulldown',
-         'face-pull-b', 'incline-db-curl', 'db-shrug', 'reverse-curl'],
+         'face-pull-b', 'incline-db-curl', 'preacher-curl', 'db-shrug', 'reverse-curl'],
     cardio: { t: 'إرجومتر — اختياري', d: '١٥ دقيقة هادي لو عندك طاقة', min: 15, opt: true },
     notes: []
   },

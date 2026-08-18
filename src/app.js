@@ -88,24 +88,70 @@ function jumpTo(i) {
   S.pos = i; S.cur = null; openEx = {}; save();
 }
 
-/* ---------- محرّك الحجم ---------- */
-function setsFor(exId, idx, week) {
-  const ex = EX[exId], W = WEEKS[week - 1];
-  if (W.extra < 0) return { s: Math.max(2, Math.ceil(ex.s / 2)), plus: 0, cut: true };
-  return { s: ex.s + (idx < W.extra ? 1 : 0), plus: idx < W.extra ? 1 : 0 };
+/* ---------- محرّك الحجم ----------
+   +١ مجموعة كل أسبوع لحد ٥ — بس مش لأول التمارين على طول.
+   المجموعة الزيادة بتروح للعضلة الأبعد عن هدف الأسبوع في جدول الحجم،
+   وبتقف لما العضلة توصل هدفها. يعني الجدول هو الحاكم مش الترتيب. */
+
+let _baseVol = null;
+function baseVolume() {
+  if (_baseVol) return _baseVol;
+  const v = {};
+  SESSIONS.forEach(D => [...(D.ex || []), ...(D.absEx || [])].forEach(id => {
+    const e = EX[id]; if (!e || e.nc) return;
+    v[e.m[0]] = (v[e.m[0]] || 0) + e.s;
+  }));
+  return (_baseVol = v);
 }
+
+/* توزيع المجموعات الزيادة على الدورة كلها مرة واحدة لكل أسبوع */
+const _bonusCache = {};
+function weekBonus(week) {
+  if (_bonusCache[week]) return _bonusCache[week];
+  const W = WEEKS[week - 1], bonus = {};
+  if (W.extra <= 0) return (_bonusCache[week] = bonus);
+
+  const proj = Object.assign({}, baseVolume());
+  ORDER.forEach(k => {
+    const D = sessByKey(k);
+    const ids = [].concat(D.ex || [], D.absEx || []);
+    const got = {};
+    for (let n = 0; n < W.extra; n++) {
+      let best = -1, bestDef = 0;
+      ids.forEach((id, i) => {
+        const e = EX[id]; if (!e || e.nc || got[i]) return;
+        const t = VOLUME_TARGET[e.m[0]]; if (!t) return;
+        const def = t[week - 1] - (proj[e.m[0]] || 0);
+        if (def > bestDef) { bestDef = def; best = i; }
+      });
+      if (best < 0) break;                       /* كل العضلات وصلت هدفها */
+      got[best] = 1;
+      const mk = EX[ids[best]].m[0];
+      proj[mk] = (proj[mk] || 0) + 1;
+      bonus[k + '|' + best] = 1;
+    }
+  });
+  return (_bonusCache[week] = bonus);
+}
+
+function planList(D, ids, week, kind, offset) {
+  const W = WEEKS[week - 1], bonus = weekBonus(week);
+  return ids.map((id, i) => {
+    const ex = EX[id];
+    if (W.extra < 0) return { id, kind, sets: Math.max(2, Math.ceil(ex.s / 2)), plus: 0, cut: true };
+    const p = bonus[D.k + '|' + (i + offset)] || 0;
+    return { id, kind, sets: ex.s + p, plus: p };
+  });
+}
+
 function sessionPlan(k, week) {
-  const D = sessByKey(k), out = [];
-  (D.warm || []).forEach(id => out.push({ id, kind: 'warm', sets: EX[id].s, plus: 0 }));
-  (D.ex || []).forEach((id, i) => {
-    const c = setsFor(id, i, week);
-    out.push({ id, kind: 'main', sets: c.s, plus: c.plus, cut: c.cut });
-  });
-  (D.absEx || []).forEach((id, i) => {
-    const c = setsFor(id, i, week);
-    out.push({ id, kind: 'abs', sets: c.s, plus: c.plus, cut: c.cut });
-  });
-  return out;
+  const D = sessByKey(k);
+  const main = D.ex || [], abs = D.absEx || [];
+  return [].concat(
+    (D.warm || []).map(id => ({ id, kind: 'warm', sets: EX[id].s, plus: 0 })),
+    planList(D, main, week, 'main', 0),
+    planList(D, abs, week, 'abs', main.length)
+  );
 }
 
 /* ---------- تاريخ التمرين ---------- */
