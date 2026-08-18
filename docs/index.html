@@ -1537,7 +1537,8 @@ let viewSid = null;   /* لو بنعرض جلسة قديمة من السجل */
 /* ============================================================
    الرسم
    ============================================================ */
-function render() {
+let lastView = null;
+function render(top) {
   ensureCur();
   $('#wkchip').innerHTML = `أسبوع ${L(S.week)}` + (S.cycle > 1 ? ` · ميزو ${L(S.cycle)}` : '');
   $$('.nav button').forEach(b => b.classList.toggle('on', b.dataset.v === view));
@@ -1546,7 +1547,20 @@ function render() {
     view === 'plan'  ? viewPlan()  :
     view === 'prog'  ? viewProg()  : viewRef();
   wire();
-  window.scrollTo(0, 0);
+  /* الرجوع لأول الصفحة بس لما الشاشة تتغيّر — غير كده بنفضل مكاننا */
+  if (top || view !== lastView) window.scrollTo(0, 0);
+  lastView = view;
+}
+
+/* إعادة رسم بتثبّت عنصر معيّن في نفس مكانه على الشاشة،
+   عشان فتح تمرين وقفل اللي قبله ميحركش الصفحة تحت إيدك */
+function renderAt(sel) {
+  const el = document.querySelector(sel);
+  const before = el ? el.getBoundingClientRect().top : null;
+  render();
+  if (before == null) return;
+  const el2 = document.querySelector(sel);
+  if (el2) window.scrollBy(0, el2.getBoundingClientRect().top - before);
 }
 
 /* ---------- عرض الجلسة الحالية ---------- */
@@ -2074,16 +2088,21 @@ function wire() {
     if (!t) return;
     const d = t.dataset, c = ensureCur();
 
-    if (d.tog) { openEx[d.tog] = !openEx[d.tog]; render(); return; }
+    if (d.tog) {
+      /* واحد مفتوح بس في المرة */
+      openEx = openEx[d.tog] ? {} : { [d.tog]: true };
+      renderAt('[data-tog="' + d.tog + '"]');
+      return;
+    }
     if (d.acc) { S.ui['a' + d.acc] = !S.ui['a' + d.acc]; save(); render(); return; }
     if (d.warm) { c.warm[d.warm] = !c.warm[d.warm]; save(); render(); return; }
 
     if (d.jump) {
       const i = +d.jump;
-      if (i === S.pos) { view = 'today'; render(); return; }
+      if (i === S.pos) { view = 'today'; render(true); return; }
       const has = Object.keys(c.ex).length || c.note || c.energy;
       if (has && !confirm('في حاجة مسجّلة في الجلسة الحالية ومش هتتقفل. تنقل برضه؟')) return;
-      jumpTo(i); view = 'today'; render(); return;
+      jumpTo(i); view = 'today'; render(true); return;
     }
 
     if (d.ck != null) {
@@ -2124,7 +2143,7 @@ function wire() {
       const next = sessByKey(ORDER[(S.pos + 1) % ORDER.length]).title;
       if (d.fin === 'skip' && !confirm('هتتخطّى الجلسة دي وتتسجّل كمتخطّاة. تمام؟')) return;
       advance(d.fin);
-      view = 'today'; render();
+      view = 'today'; render(true);
       toast((d.fin === 'skip' ? 'اتخطّت — ' : 'اتقفلت ✓ — ') + 'الجاية: ' + next);
       return;
     }
@@ -2188,7 +2207,7 @@ function wire() {
       const v = Math.min(6, Math.max(1, +t.value || 1));
       S.week = v; if (S.cur) S.cur.week = v; save(); render(); return;
     }
-    if (t.id === 'setpos') { jumpTo(+t.value); render(); return; }
+    if (t.id === 'setpos') { jumpTo(+t.value); render(true); return; }
     if (t.id === 'impf') { importData(t.files[0]); return; }
   };
 }
@@ -2291,7 +2310,7 @@ document.addEventListener('click', ev => {
   if (n) { view = n.dataset.v; render(); return; }
   if (ev.target.closest('#tskip')) { stopRest(); return; }
   if (ev.target.closest('#tadd')) { restLeft += 30; paintRest(); return; }
-  if (ev.target.closest('#gotoday')) { view = 'today'; render(); return; }
+  if (ev.target.closest('#gotoday')) { view = 'today'; render(true); return; }
 });
 
 seedFromHash();
