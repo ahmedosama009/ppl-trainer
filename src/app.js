@@ -117,18 +117,24 @@ function weekBonus(week) {
     const ids = [].concat(D.ex || [], D.absEx || []);
     const got = {};
     for (let n = 0; n < W.extra; n++) {
+      /* الأفضل نوزّع على تمارين مختلفة؛ لكن لو عضلة لسه ناقصة
+         ومفيش تمرين تاني ليها في الجلسة، ناخد مجموعة تانية على نفس التمرين */
       let best = -1, bestDef = 0;
-      ids.forEach((id, i) => {
-        const e = EX[id]; if (!e || e.nc || got[i]) return;
-        const t = VOLUME_TARGET[e.m[0]]; if (!t) return;
-        const def = t[week - 1] - (proj[e.m[0]] || 0);
-        if (def > bestDef) { bestDef = def; best = i; }
-      });
+      for (const fresh of [true, false]) {
+        ids.forEach((id, i) => {
+          const e = EX[id]; if (!e || e.nc) return;
+          if (fresh && got[i]) return;
+          const t = VOLUME_TARGET[e.m[0]]; if (!t) return;
+          const def = t[week - 1] - (proj[e.m[0]] || 0);
+          if (def > bestDef) { bestDef = def; best = i; }
+        });
+        if (best >= 0) break;
+      }
       if (best < 0) break;                       /* كل العضلات وصلت هدفها */
-      got[best] = 1;
+      got[best] = (got[best] || 0) + 1;
       const mk = EX[ids[best]].m[0];
       proj[mk] = (proj[mk] || 0) + 1;
-      bonus[k + '|' + best] = 1;
+      bonus[k + '|' + best] = got[best];
     }
   });
   return (_bonusCache[week] = bonus);

@@ -382,7 +382,7 @@ const EX = {
     tip: 'أهم تمرين في الأسبوع — سجّل رقمه بدقة.'
   },
   'incline-db': {
-    n: 'ضغط دمبل مائل ٣٠°', im: ['pushA', 2], s: 3, lo: 6, hi: 8, inc: 2.5, r: 150,
+    n: 'ضغط دمبل مائل ٣٠°', im: ['pushA', 2], s: 2, lo: 6, hi: 8, inc: 2.5, r: 150,
     m: ['chest', 'shoulders'],
     cue: ['ميل البنش ٣٠° بس — أكتر من كده يحوّله لضغط كتف',
           'الدمبل ينزل لجنب الصدر العلوي مش لفوق الوش',
@@ -390,7 +390,7 @@ const EX = {
           'الكوع تحت الرسغ في كل نقطة']
   },
   'dips': {
-    n: 'ديب بأوزان', im: ['pushA', 3], s: 3, lo: 8, hi: 10, inc: 2.5, r: 150,
+    n: 'ديب بأوزان', im: ['pushA', 3], s: 2, lo: 8, hi: 10, inc: 2.5, r: 150,
     m: ['chest', 'triceps'],
     cue: ['ميل الجذع لقدام شوية عشان الشغل يروح للصدر',
           'انزل لحد ما الدراع يوازي الأرض وبس',
@@ -461,7 +461,7 @@ const EX = {
           'لو مكمّلتش ٥ عدات نضيفة، شيل وزن']
   },
   'chest-supported-row': {
-    n: 'تجديف بدعامة صدر', im: ['pullA', 2], s: 3, lo: 8, hi: 10, inc: 2.5, r: 120,
+    n: 'تجديف بدعامة صدر', im: ['pullA', 2], s: 2, lo: 8, hi: 10, inc: 2.5, r: 120,
     m: ['back'],
     cue: ['الصدر ملزوق في الدعامة — دي الحاجة اللي بتحمي ضهرك',
           'اسحب لحد ما الكوع يعدّي خط الجسم',
@@ -575,7 +575,7 @@ const EX = {
           'خفيف ومتحكَّم — تسخين مش تمرين']
   },
   'incline-db-b': {
-    n: 'ضغط دمبل مائل', im: ['pushB', 1], s: 4, lo: 10, hi: 12, inc: 2.5, r: 120,
+    n: 'ضغط دمبل مائل', im: ['pushB', 1], s: 3, lo: 10, hi: 12, inc: 2.5, r: 120,
     m: ['chest', 'shoulders'],
     cue: ['نفس حركة السبت بس بعدات أعلى ووزن أخف',
           'ركّز على الإحساس في الصدر العلوي مش على الرقم',
@@ -589,7 +589,7 @@ const EX = {
           'الجهاز آمن — ممكن تروّح لآخر المدى هنا']
   },
   'pec-deck': {
-    n: 'Pec Deck', im: ['pushB', 3], s: 3, lo: 12, hi: 15, inc: 1.5, r: 90,
+    n: 'Pec Deck', im: ['pushB', 3], s: 2, lo: 12, hi: 15, inc: 1.5, r: 90,
     m: ['chest'],
     cue: ['الكوع في مستوى الكتف',
           'اعصر في المنتصف ثانية كاملة',
@@ -640,7 +640,7 @@ const EX = {
 
   /* ---------- Pull B ---------- */
   'neutral-pulldown': {
-    n: 'سحب أمامي قبضة محايدة', im: ['pullB', 0], s: 4, lo: 10, hi: 12, inc: 2.5, r: 120,
+    n: 'سحب أمامي قبضة محايدة', im: ['pullB', 0], s: 3, lo: 10, hi: 12, inc: 2.5, r: 120,
     m: ['back'],
     cue: ['ابدأ بسحب لوح الكتف لتحت قبل ما الكوع يثني',
           'اسحب للصدر العلوي والجذع مايل شوية لورا',
@@ -655,7 +655,7 @@ const EX = {
     tip: 'أقرب إحساس لسحبة التجديف — خلي إيقاعك ثابت.'
   },
   'one-arm-db-row': {
-    n: 'تجديف دمبل ذراع واحدة', im: ['pullB', 2], s: 3, lo: 12, hi: 12, inc: 2.5, r: 90,
+    n: 'تجديف دمبل ذراع واحدة', im: ['pullB', 2], s: 2, lo: 12, hi: 12, inc: 2.5, r: 90,
     m: ['back'],
     cue: ['الضهر موازي للأرض والحوض مش بيلف',
           'اسحب الدمبل ناحية الخصر مش ناحية الكتف',
@@ -899,7 +899,7 @@ const SESSIONS = [
   {
     k: 'pushA', title: 'Push A', tag: 'ثقيل', type: 'push',
     sub: 'صدر · كتف أمامي وجانبي · ترايسبس. أعلى شدّة في الدورة.',
-    dur: 80,
+    dur: 70,
     warm: ['ext-rot'],
     ex: ['bench', 'incline-db', 'dips', 'db-shoulder-press', 'lateral-raise',
          'overhead-tri', 'rope-pushdown', 'scap-pushup'],
@@ -909,7 +909,7 @@ const SESSIONS = [
   {
     k: 'pullA', title: 'Pull A', tag: 'ثقيل', type: 'pull',
     sub: 'ظهر · كتف خلفي · بايسبس · قبضة.',
-    dur: 65,
+    dur: 60,
     warm: [],
     ex: ['barbell-row', 'weighted-pullup', 'chest-supported-row', 'back-extension',
          'face-pull', 'ez-curl', 'hammer-curl', 'farmer-carry'],
@@ -937,7 +937,7 @@ const SESSIONS = [
   {
     k: 'pushB', title: 'Push B', tag: 'حجم', type: 'push',
     sub: 'نفس العضلات بعدات أعلى وأوزان أخف. تركيز على الصدر العلوي والكتف الجانبي.',
-    dur: 70,
+    dur: 65,
     warm: ['ext-rot-b'],
     ex: ['incline-db-b', 'machine-press', 'pec-deck', 'cable-lateral',
          'rear-delt-machine', 'rope-pushdown-b', 'neck'],
@@ -947,7 +947,7 @@ const SESSIONS = [
   {
     k: 'pullB', title: 'Pull B', tag: 'حجم', type: 'pull',
     sub: 'عدات أعلى · تنويع في زوايا السحب · بايسبس من زاويتين.',
-    dur: 70,
+    dur: 65,
     warm: [],
     ex: ['neutral-pulldown', 'seated-cable-row', 'one-arm-db-row', 'straight-arm-pulldown',
          'face-pull-b', 'incline-db-curl', 'preacher-curl', 'db-shrug', 'reverse-curl'],
@@ -1217,18 +1217,24 @@ function weekBonus(week) {
     const ids = [].concat(D.ex || [], D.absEx || []);
     const got = {};
     for (let n = 0; n < W.extra; n++) {
+      /* الأفضل نوزّع على تمارين مختلفة؛ لكن لو عضلة لسه ناقصة
+         ومفيش تمرين تاني ليها في الجلسة، ناخد مجموعة تانية على نفس التمرين */
       let best = -1, bestDef = 0;
-      ids.forEach((id, i) => {
-        const e = EX[id]; if (!e || e.nc || got[i]) return;
-        const t = VOLUME_TARGET[e.m[0]]; if (!t) return;
-        const def = t[week - 1] - (proj[e.m[0]] || 0);
-        if (def > bestDef) { bestDef = def; best = i; }
-      });
+      for (const fresh of [true, false]) {
+        ids.forEach((id, i) => {
+          const e = EX[id]; if (!e || e.nc) return;
+          if (fresh && got[i]) return;
+          const t = VOLUME_TARGET[e.m[0]]; if (!t) return;
+          const def = t[week - 1] - (proj[e.m[0]] || 0);
+          if (def > bestDef) { bestDef = def; best = i; }
+        });
+        if (best >= 0) break;
+      }
       if (best < 0) break;                       /* كل العضلات وصلت هدفها */
-      got[best] = 1;
+      got[best] = (got[best] || 0) + 1;
       const mk = EX[ids[best]].m[0];
       proj[mk] = (proj[mk] || 0) + 1;
-      bonus[k + '|' + best] = 1;
+      bonus[k + '|' + best] = got[best];
     }
   });
   return (_bonusCache[week] = bonus);
