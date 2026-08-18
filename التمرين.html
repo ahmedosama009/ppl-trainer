@@ -1778,8 +1778,17 @@ function viewRef() {
       </div>
       <div class="sub" style="margin-top:9px">سجلاتك بتترفع لحسابك أول ما يبقى في نت. افتح الأداة على أي جهاز وسجّل بنفس الحساب وهتلاقي كل حاجة.</div>`;
     } else {
-      h += `<button class="btn p" style="width:100%" data-signin="1">تسجيل الدخول بجوجل</button>
-      <div class="sub" style="margin-top:9px">من غير تسجيل دخول الأداة شغّالة عادي — البيانات بتفضل على الجهاز ده بس ومش بتتزامن.</div>`;
+      h += `<label class="lb">الإيميل</label>
+      <input class="inp" type="email" inputmode="email" autocomplete="username"
+             placeholder="you@example.com" value="${esc(S.ui.mail || '')}" id="syncmail">
+      <label class="lb" style="margin-top:8px">الباسورد</label>
+      <input class="inp" type="password" autocomplete="current-password" placeholder="٦ حروف على الأقل" id="syncpass">
+      <div class="exacts" style="margin-top:10px">
+        <button class="btn p" data-signin="1">دخول</button>
+        <button class="btn" data-signup="1">حساب جديد</button>
+        <button class="btn sm" data-resetpass="1">نسيت الباسورد</button>
+      </div>
+      <div class="sub" style="margin-top:9px">الباسورد بيروح لـ Firebase مباشرة — الأداة مبتشوفهوش ومبتخزّنهوش. من غير تسجيل دخول كل حاجة شغّالة عادي، بس البيانات بتفضل على الجهاز ده بس.</div>`;
     }
     h += `</div>`;
   }
@@ -1820,7 +1829,7 @@ function wire() {
   const app = $('#app');
 
   app.onclick = ev => {
-    const t = ev.target.closest('[data-tog],[data-ck],[data-fill],[data-rest],[data-hist],[data-jump],[data-acc],[data-fin],[data-cpy],[data-cardio],[data-warm],[data-addbody],[data-delbody],[data-addtest],[data-deltest],[data-exp],[data-imp],[data-reset],[data-signin],[data-signout],[data-syncnow]');
+    const t = ev.target.closest('[data-tog],[data-ck],[data-fill],[data-rest],[data-hist],[data-jump],[data-acc],[data-fin],[data-cpy],[data-cardio],[data-warm],[data-addbody],[data-delbody],[data-addtest],[data-deltest],[data-exp],[data-imp],[data-reset],[data-signin],[data-signup],[data-resetpass],[data-signout],[data-syncnow]');
     if (!t) return;
     const d = t.dataset, c = ensureCur();
 
@@ -1899,7 +1908,15 @@ function wire() {
     }
     if (d.deltest) { S.tests = S.tests.filter(x => x.d !== d.deltest); save(); render(); return; }
 
-    if (d.signin) { Sync.signIn(); return; }
+    if (d.signin || d.signup || d.resetpass) {
+      const m = ($('#syncmail') || {}).value || '';
+      const pw = ($('#syncpass') || {}).value || '';
+      S.ui.mail = m; save();                       /* الإيميل بس — الباسورد عمره ما بيتخزّن */
+      if (d.resetpass) Sync.resetPass(m);
+      else if (d.signup) Sync.signUp(m, pw);
+      else Sync.signIn(m, pw);
+      return;
+    }
     if (d.signout) {
       if (confirm('البيانات هتفضل على الجهاز ده، بس مش هتتزامن تاني لحد ما تسجّل دخول. تمام؟')) Sync.signOut();
       return;

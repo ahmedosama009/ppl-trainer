@@ -1,5 +1,5 @@
 /* ============================================================
-   المزامنة — Firebase Auth (جوجل) + Firestore عبر REST
+   المزامنة — Firebase Auth (إيميل + باسورد) + Firestore عبر REST
 
    المبدأ: localStorage هو الأساس دايمًا. المزامنة بتحصل لما يبقى في نت،
    والدمج بالمعرّف الفريد لكل جلسة — يعني لو سجّلت من جهازين، الاتنين
@@ -41,32 +41,57 @@ const Sync = (() => {
         if (u) { setStatus('sync', 'بيزامن…'); pull(true); }
         else setStatus('off', 'مش مسجّل دخول');
       });
-      auth.getRedirectResult().catch(e => console.warn('redirect', e));
     } catch (e) {
       console.warn('firebase init', e);
       setStatus('err', 'مشكلة في التشغيل');
     }
   }
 
-  /* ---------- الدخول والخروج ---------- */
-  async function signIn() {
-    if (!auth) return toast('المزامنة مش متاحة هنا');
-    const p = new firebase.auth.GoogleAuthProvider();
-    p.setCustomParameters({ prompt: 'select_account' });
-    try {
-      await auth.signInWithPopup(p);
-    } catch (e) {
-      /* الآيفون في وضع التطبيق بيمنع النوافذ المنبثقة — بنحوّل لإعادة التوجيه */
-      if (['auth/popup-blocked', 'auth/popup-closed-by-user',
-           'auth/cancelled-popup-request', 'auth/operation-not-supported-in-this-environment'
-          ].includes(e.code)) {
-        try { await auth.signInWithRedirect(p); return; } catch (e2) { e = e2; }
-      }
-      console.warn('signIn', e);
-      setStatus('err', 'الدخول فشل: ' + (e.code || e.message));
-      toast('الدخول فشل — جرّب من سفاري');
-    }
+  /* ---------- الدخول والخروج (إيميل + باسورد) ----------
+     الباسورد بيروح لـ Firebase مباشرة ومبيتخزّنش في الأداة ولا في الكود. */
+  const ERRS = {
+    'auth/invalid-email': 'الإيميل مش مظبوط',
+    'auth/user-not-found': 'مفيش حساب بالإيميل ده — اعمل حساب جديد',
+    'auth/wrong-password': 'الباسورد غلط',
+    'auth/invalid-credential': 'الإيميل أو الباسورد غلط',
+    'auth/email-already-in-use': 'الإيميل ده ليه حساب بالفعل — سجّل دخول عادي',
+    'auth/weak-password': 'الباسورد لازم ٦ حروف على الأقل',
+    'auth/missing-password': 'اكتب الباسورد',
+    'auth/too-many-requests': 'محاولات كتير — استنى شوية وجرّب تاني',
+    'auth/network-request-failed': 'مفيش نت',
+    'auth/operation-not-allowed': 'الدخول بالإيميل لسه متفعّلش في إعدادات المشروع',
+    'auth/unauthorized-domain': 'النطاق ده مش مسموح في إعدادات المشروع'
+  };
+  const emsg = e => ERRS[e.code] || e.code || e.message;
+
+  function ok(email, pass) {
+    if (!auth) { toast('المزامنة مش متاحة في النسخة دي'); return false; }
+    if (!email || !email.includes('@')) { toast('اكتب إيميل صحيح'); return false; }
+    if (!pass || pass.length < 6) { toast('الباسورد لازم ٦ حروف على الأقل'); return false; }
+    return true;
   }
+
+  async function signIn(email, pass) {
+    if (!ok(email, pass)) return;
+    setStatus('sync', 'بيسجّل دخول…');
+    try { await auth.signInWithEmailAndPassword(email.trim(), pass); toast('تمام — بيزامن دلوقتي'); }
+    catch (e) { console.warn('signIn', e); setStatus('err', emsg(e)); toast(emsg(e)); }
+  }
+
+  async function signUp(email, pass) {
+    if (!ok(email, pass)) return;
+    setStatus('sync', 'بيعمل الحساب…');
+    try { await auth.createUserWithEmailAndPassword(email.trim(), pass); toast('الحساب اتعمل — بيرفع بياناتك'); }
+    catch (e) { console.warn('signUp', e); setStatus('err', emsg(e)); toast(emsg(e)); }
+  }
+
+  async function resetPass(email) {
+    if (!auth) return;
+    if (!email || !email.includes('@')) return toast('اكتب إيميلك الأول');
+    try { await auth.sendPasswordResetEmail(email.trim()); toast('بعتنالك لينك تغيير الباسورد على إيميلك'); }
+    catch (e) { toast(emsg(e)); }
+  }
+
   async function signOut() {
     if (auth) await auth.signOut();
     setStatus('off', 'اتسجّل خروج');
@@ -196,7 +221,7 @@ const Sync = (() => {
   addEventListener('online', () => { if (user) pull(true); });
 
   return {
-    init, signIn, signOut, push, pull, merge,
+    init, signIn, signUp, resetPass, signOut, push, pull, merge,
     get user() { return user; },
     get status() { return status; },
     available: () => typeof firebase !== 'undefined'
