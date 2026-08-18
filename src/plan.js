@@ -99,7 +99,7 @@ const EX = {
           'الحزام بالأوزان بين الرجلين ثابت من غير مرجحة']
   },
   'db-shoulder-press': {
-    n: 'ضغط دمبل جالس', im: ['pushA', 4], s: 3, lo: 6, hi: 8, inc: 2.5, r: 150,
+    n: 'ضغط دمبل جالس', im: ['pushA', 4], s: 2, lo: 6, hi: 8, inc: 2.5, r: 150,
     m: ['shoulders', 'triceps'],
     cue: ['ضهرك مسنود والبطن مشدودة — بلاش تقويس',
           'الدمبل يبدأ عند مستوى الودن وينتهي فوق من غير قفل عنيف',
@@ -233,14 +233,14 @@ const EX = {
     tip: 'ده أقرب تمرين لحركة التجديف — دفع بالرجل وانثناء من الحوض. حطه في أولويتك.'
   },
   'leg-press': {
-    n: 'Leg press', im: ['legsA', 2], s: 3, lo: 10, hi: 12, inc: 5, r: 150,
+    n: 'Leg press', im: ['legsA', 2], s: 2, lo: 10, hi: 12, inc: 5, r: 150,
     m: ['quads'],
     cue: ['الرجل في نص المنصة وبعرض الكتف',
           'انزل لحد ما الركبة توصل ٩٠° من غير ما الحوض يتلف',
           'متقفلش الركبة بعنف في الأعلى']
   },
   'bulgarian': {
-    n: 'Bulgarian split squat', im: ['legsA', 3], s: 3, lo: 10, hi: 10, each: true, inc: 2.5, r: 120,
+    n: 'Bulgarian split squat', im: ['legsA', 3], s: 2, lo: 10, hi: 10, each: true, inc: 2.5, r: 120,
     m: ['quads', 'posterior'],
     cue: ['الرجل الخلفية على البنش والمسافة كفاية عشان الركبة الأمامية متعديش كتير',
           'الجذع مايل لقدام شوية = شغل أكتر للمؤخرة',
@@ -304,14 +304,14 @@ const EX = {
           'وزن معقول — ده تمرين مطّ مش قوة']
   },
   'cable-lateral': {
-    n: 'رفرفة جانبية كابل', im: ['pushB', 5], s: 3, lo: 12, hi: 15, inc: 1.5, r: 75,
+    n: 'رفرفة جانبية كابل', im: ['pushB', 5], s: 2, lo: 12, hi: 15, inc: 1.5, r: 75,
     m: ['shoulders'],
     cue: ['الكابل من ورا الجسم بيدّي توتر ثابت طول المدى',
           'اوقف عند مستوى الكتف',
           'إيد واحدة كل مرة عشان تركيز أعلى']
   },
   'rear-delt-machine': {
-    n: 'رفرفة خلفية جهاز', im: ['pushB', 6], s: 3, lo: 15, hi: 15, inc: 1.5, r: 60,
+    n: 'رفرفة خلفية جهاز', im: ['pushB', 6], s: 2, lo: 15, hi: 15, inc: 1.5, r: 60,
     m: ['shoulders'],
     cue: ['الصدر في الدعامة والدراع شبه مفرود',
           'افتح لبرا لحد خط الكتف',
@@ -384,7 +384,7 @@ const EX = {
           'مرتين في الأسبوع — ده اللي بيحافظ على كتفك']
   },
   'incline-db-curl': {
-    n: 'مرجحة دمبل مائل', im: ['pullB', 6], s: 3, lo: 12, hi: 12, inc: 1.5, r: 75,
+    n: 'مرجحة دمبل مائل', im: ['pullB', 6], s: 2, lo: 12, hi: 12, inc: 1.5, r: 75,
     m: ['biceps'],
     cue: ['البنش مايل والدراع متدلّي ورا خط الجسم',
           'ده أقوى وضع لمطّ الرأس الطويلة للبايسبس',
@@ -438,7 +438,7 @@ const EX = {
           'الدفع من الكعب']
   },
   'walking-lunges': {
-    n: 'Walking lunges', im: ['legsB', 3], s: 3, lo: 12, hi: 12, each: true, inc: 2.5, r: 120,
+    n: 'Walking lunges', im: ['legsB', 3], s: 2, lo: 12, hi: 12, each: true, inc: 2.5, r: 120,
     m: ['quads', 'posterior'],
     cue: ['خطوة كبيرة والركبة الخلفية تقرّب من الأرض',
           'الجذع مستقيم والبطن مشدودة',
@@ -516,7 +516,7 @@ const EX = {
           'ثبّت الكتف في البار ومتسيبش جسمك يتمدّد']
   },
   'woodchop': {
-    n: 'Cable woodchop', im: ['abs12', 5], s: 3, lo: 12, hi: 12, each: true, inc: 1.5, r: 60,
+    n: 'Cable woodchop', im: ['abs12', 5], s: 2, lo: 12, hi: 12, each: true, inc: 1.5, r: 60,
     m: ['abs'],
     cue: ['الحركة قطرية من فوق لتحت (أو العكس)',
           'اللف من الجذع مش من الدراع',
@@ -554,7 +554,7 @@ const EX = {
           'تحكّم في السرعة — بلاش رمي الرجلين']
   },
   'suitcase-carry': {
-    n: 'Suitcase carry', im: ['abs3', 2], s: 3, lo: 40, hi: 40, u: 'm', each: true, inc: 5, r: 75,
+    n: 'Suitcase carry', im: ['abs3', 2], s: 2, lo: 40, hi: 40, u: 'm', each: true, inc: 5, r: 75,
     m: ['abs', 'grip'],
     cue: ['وزن في إيد واحدة بس — الهدف تقاوم الميل',
           'الكتفين على نفس الخط',
@@ -619,7 +619,7 @@ const SESSIONS = [
   {
     k: 'legsA', title: 'Legs A', tag: 'ثقيل', type: 'legs',
     sub: 'رجل أمامي وخلفي · سمانة · قصبة.',
-    dur: 70,
+    dur: 65,
     warm: [],
     ex: ['back-squat', 'rdl-bar', 'leg-press', 'bulgarian', 'lying-leg-curl',
          'standing-calf', 'tibialis'],
@@ -629,7 +629,7 @@ const SESSIONS = [
   {
     k: 'recovA', title: 'فترات + بطن + سونا', tag: 'فترات', type: 'recov',
     sub: 'جلسة الإرجومتر القوية الوحيدة في الدورة — جايّة بعد يوم الرجل عن قصد. ومعاها البطن.',
-    dur: 60, intervals: true,
+    dur: 55, intervals: true,
     warm: [], ex: [],
     absTitle: 'البطن — فرد ولفّ',
     absEx: ['ab-wheel', 'hanging-leg-raise', 'woodchop'],
@@ -658,7 +658,7 @@ const SESSIONS = [
   {
     k: 'legsB', title: 'Legs B', tag: 'حجم', type: 'legs',
     sub: 'أولوية للخلفية والمؤخرة · عدات أعلى · أوزان أخف من Legs A.',
-    dur: 60,
+    dur: 55,
     warm: [],
     ex: ['rdl-db', 'front-squat', 'hip-thrust', 'walking-lunges', 'seated-leg-curl', 'seated-calf'],
     notes: ['لو السكوات الأمامي تقيل على الكتف، استبدله بـ Goblet squat — نفس الشغل بضغط أقل.']
@@ -666,7 +666,7 @@ const SESSIONS = [
   {
     k: 'recovB', title: 'استشفاء + بطن + سونا', tag: 'راحة', type: 'recov',
     sub: 'قفلة الدورة: إرجومتر هادي وبطن وسونا. مفيش شدّة هنا خالص.',
-    dur: 55, steady: true,
+    dur: 50, steady: true,
     warm: [], ex: [],
     absTitle: 'البطن — ثني ومقاومة لفّ وحمل',
     absEx: ['cable-crunch', 'pallof', 'suitcase-carry'],

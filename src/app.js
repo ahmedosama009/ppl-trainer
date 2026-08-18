@@ -104,37 +104,34 @@ function baseVolume() {
   return (_baseVol = v);
 }
 
-/* توزيع المجموعات الزيادة على الدورة كلها مرة واحدة لكل أسبوع */
+/* توزيع المجموعات الزيادة — مرة واحدة لكل أسبوع على الدورة كلها.
+   كل عضلة بتاخد بالظبط الفرق بين هدف الأسبوع وقاعدتها، موزّع بالتناوب
+   على تمارينها عبر الجلسات. كده الجدول هو اللي بيحكم، مش ترتيب التمارين
+   ولا سقف ثابت للجلسة — وكل عضلة بتوصل هدفها بالضبط. */
 const _bonusCache = {};
 function weekBonus(week) {
   if (_bonusCache[week]) return _bonusCache[week];
   const W = WEEKS[week - 1], bonus = {};
   if (W.extra <= 0) return (_bonusCache[week] = bonus);
 
-  const proj = Object.assign({}, baseVolume());
+  /* تمارين كل عضلة عبر الدورة، بالترتيب */
+  const slots = {};
   ORDER.forEach(k => {
     const D = sessByKey(k);
-    const ids = [].concat(D.ex || [], D.absEx || []);
-    const got = {};
-    for (let n = 0; n < W.extra; n++) {
-      /* الأفضل نوزّع على تمارين مختلفة؛ لكن لو عضلة لسه ناقصة
-         ومفيش تمرين تاني ليها في الجلسة، ناخد مجموعة تانية على نفس التمرين */
-      let best = -1, bestDef = 0;
-      for (const fresh of [true, false]) {
-        ids.forEach((id, i) => {
-          const e = EX[id]; if (!e || e.nc) return;
-          if (fresh && got[i]) return;
-          const t = VOLUME_TARGET[e.m[0]]; if (!t) return;
-          const def = t[week - 1] - (proj[e.m[0]] || 0);
-          if (def > bestDef) { bestDef = def; best = i; }
-        });
-        if (best >= 0) break;
-      }
-      if (best < 0) break;                       /* كل العضلات وصلت هدفها */
-      got[best] = (got[best] || 0) + 1;
-      const mk = EX[ids[best]].m[0];
-      proj[mk] = (proj[mk] || 0) + 1;
-      bonus[k + '|' + best] = got[best];
+    [].concat(D.ex || [], D.absEx || []).forEach((id, i) => {
+      const e = EX[id]; if (!e || e.nc || !VOLUME_TARGET[e.m[0]]) return;
+      (slots[e.m[0]] = slots[e.m[0]] || []).push(k + '|' + i);
+    });
+  });
+
+  const base = baseVolume();
+  Object.keys(VOLUME_TARGET).forEach(m => {
+    const need = VOLUME_TARGET[m][week - 1] - (base[m] || 0);
+    const list = slots[m] || [];
+    if (need <= 0 || !list.length) return;
+    for (let n = 0; n < need; n++) {
+      const key = list[n % list.length];
+      bonus[key] = (bonus[key] || 0) + 1;
     }
   });
   return (_bonusCache[week] = bonus);
@@ -144,7 +141,7 @@ function planList(D, ids, week, kind, offset) {
   const W = WEEKS[week - 1], bonus = weekBonus(week);
   return ids.map((id, i) => {
     const ex = EX[id];
-    if (W.extra < 0) return { id, kind, sets: Math.max(2, Math.ceil(ex.s / 2)), plus: 0, cut: true };
+    if (W.extra < 0) return { id, kind, sets: Math.max(1, Math.round(ex.s / 2)), plus: 0, cut: true };
     const p = bonus[D.k + '|' + (i + offset)] || 0;
     return { id, kind, sets: ex.s + p, plus: p };
   });
