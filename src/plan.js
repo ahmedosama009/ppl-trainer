@@ -169,7 +169,7 @@ const EX = {
           'وقفة نصف ثانية في القمة واعصر لوح الكتف']
   },
   'back-extension': {
-    n: 'Back extension', im: ['pullA', 3], s: 3, lo: 12, hi: 15, inc: 1.5, r: 90,
+    n: 'Back extension', im: ['pullA', 3], s: 2, lo: 12, hi: 15, inc: 1.5, r: 90,
     m: ['posterior'],
     cue: ['الحركة من الحوض مش من الفقرات',
           'اوقف عند خط الجسم المستقيم — بلاش تقويس زيادة',
@@ -247,7 +247,7 @@ const EX = {
           'اتزن الأول من غير وزن قبل ما تمسك دمبل']
   },
   'lying-leg-curl': {
-    n: 'Lying leg curl', im: ['legsA', 4], s: 3, lo: 10, hi: 12, inc: 1.5, r: 90,
+    n: 'Lying leg curl', im: ['legsA', 4], s: 2, lo: 10, hi: 12, inc: 1.5, r: 90,
     m: ['posterior'],
     cue: ['الحوض ملزوق في الوسادة — متسيبهوش يقوم',
           'اثنِ لأقصى مدى واعصر ثانية',
@@ -304,7 +304,7 @@ const EX = {
           'وزن معقول — ده تمرين مطّ مش قوة']
   },
   'cable-lateral': {
-    n: 'رفرفة جانبية كابل', im: ['pushB', 5], s: 4, lo: 12, hi: 15, inc: 1.5, r: 75,
+    n: 'رفرفة جانبية كابل', im: ['pushB', 5], s: 3, lo: 12, hi: 15, inc: 1.5, r: 75,
     m: ['shoulders'],
     cue: ['الكابل من ورا الجسم بيدّي توتر ثابت طول المدى',
           'اوقف عند مستوى الكتف',
@@ -377,7 +377,7 @@ const EX = {
           'وزن خفيف — الكتف الخلفي صغير وبيتغلب بسرعة']
   },
   'face-pull-b': {
-    n: 'Face pull', im: ['pullB', 5], s: 3, lo: 15, hi: 15, inc: 1.5, r: 60,
+    n: 'Face pull', im: ['pullB', 5], s: 2, lo: 15, hi: 15, inc: 1.5, r: 60,
     m: ['shoulders'],
     cue: ['الحبل على مستوى الوش',
           'افتح لحد ما الإيدين جنب الودان مع دوران خارجي',
@@ -414,7 +414,7 @@ const EX = {
 
   /* ---------- Legs B ---------- */
   'rdl-db': {
-    n: 'رفعة رومانية دمبل', im: ['legsB', 0], s: 3, lo: 10, hi: 12, inc: 5, r: 150,
+    n: 'رفعة رومانية دمبل', im: ['legsB', 0], s: 2, lo: 10, hi: 12, inc: 5, r: 150,
     m: ['posterior'],
     cue: ['الدمبل قريّب من الرجل وهو نازل',
           'انثناء من الحوض — الركبة لينة بس مش بتثني',
@@ -430,7 +430,7 @@ const EX = {
     tip: 'لو تقيل على الكتف أو الرسغ، استبدله بـ Goblet squat — نفس الشغل بضغط أقل.'
   },
   'hip-thrust': {
-    n: 'Hip thrust', im: ['legsB', 2], s: 3, lo: 10, hi: 12, inc: 5, r: 120,
+    n: 'Hip thrust', im: ['legsB', 2], s: 2, lo: 10, hi: 12, inc: 5, r: 120,
     m: ['posterior'],
     cue: ['حافة البنش تحت أسفل لوح الكتف',
           'الدقن ناحية الصدر والنظرة لقدام',
@@ -610,7 +610,7 @@ const SESSIONS = [
   {
     k: 'pullA', title: 'Pull A', tag: 'ثقيل', type: 'pull',
     sub: 'ظهر · كتف خلفي · بايسبس · قبضة.',
-    dur: 70,
+    dur: 65,
     warm: [],
     ex: ['barbell-row', 'weighted-pullup', 'chest-supported-row', 'back-extension',
          'face-pull', 'ez-curl', 'hammer-curl', 'farmer-carry'],
@@ -619,7 +619,7 @@ const SESSIONS = [
   {
     k: 'legsA', title: 'Legs A', tag: 'ثقيل', type: 'legs',
     sub: 'رجل أمامي وخلفي · سمانة · قصبة.',
-    dur: 75,
+    dur: 70,
     warm: [],
     ex: ['back-squat', 'rdl-bar', 'leg-press', 'bulgarian', 'lying-leg-curl',
          'standing-calf', 'tibialis'],
@@ -638,7 +638,7 @@ const SESSIONS = [
   {
     k: 'pushB', title: 'Push B', tag: 'حجم', type: 'push',
     sub: 'نفس العضلات بعدات أعلى وأوزان أخف. تركيز على الصدر العلوي والكتف الجانبي.',
-    dur: 75,
+    dur: 70,
     warm: ['ext-rot-b'],
     ex: ['incline-db-b', 'machine-press', 'pec-deck', 'cable-lateral',
          'rear-delt-machine', 'rope-pushdown-b', 'neck'],
@@ -648,7 +648,7 @@ const SESSIONS = [
   {
     k: 'pullB', title: 'Pull B', tag: 'حجم', type: 'pull',
     sub: 'عدات أعلى · تنويع في زوايا السحب · بايسبس من زاويتين.',
-    dur: 75,
+    dur: 70,
     warm: [],
     ex: ['neutral-pulldown', 'seated-cable-row', 'one-arm-db-row', 'straight-arm-pulldown',
          'face-pull-b', 'incline-db-curl', 'preacher-curl', 'db-shrug', 'reverse-curl'],
@@ -658,7 +658,7 @@ const SESSIONS = [
   {
     k: 'legsB', title: 'Legs B', tag: 'حجم', type: 'legs',
     sub: 'أولوية للخلفية والمؤخرة · عدات أعلى · أوزان أخف من Legs A.',
-    dur: 70,
+    dur: 60,
     warm: [],
     ex: ['rdl-db', 'front-squat', 'hip-thrust', 'walking-lunges', 'seated-leg-curl', 'seated-calf'],
     notes: ['لو السكوات الأمامي تقيل على الكتف، استبدله بـ Goblet squat — نفس الشغل بضغط أقل.']
