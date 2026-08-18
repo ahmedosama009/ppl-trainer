@@ -231,6 +231,25 @@ function renderAt(sel) {
   if (el2) window.scrollBy(0, el2.getBoundingClientRect().top - before);
 }
 
+
+/* ---------- حواجز v3 ---------- */
+/* أقدم جلسة في الدورة الحالية — منها بنحسب هي واخدة كام يوم */
+function cycleWarnings() {
+  const out = [];
+  const mine = S.history.filter(r => r.week === S.week && r.cycle === S.cycle);
+  if (mine.length) {
+    const first = mine.map(r => r.date).sort()[0];
+    const days = Math.round((parse(today()) - parse(first)) / 864e5) + 1;
+    if (days > GUARDS.maxCycleDays)
+      out.push({ t: 'warn', m: `الدورة دي واخدة ${days} يوم — الحد المفضّل ${GUARDS.maxCycleDays}. لو الوتيرة بتتمطّ، قلّل حجم الجلسة بدل ما تفوّتها.` });
+  }
+  /* نفس الجلسة اتخطّت كام مرة ورا بعض */
+  const k = ORDER[S.pos], prior = S.history.filter(r => r.k === k).slice(-GUARDS.warnOnRepeatedSkip);
+  if (prior.length >= GUARDS.warnOnRepeatedSkip && prior.every(r => r.status === 'skip'))
+    out.push({ t: 'warn', m: `الجلسة دي اتخطّت ${prior.length} مرات ورا بعض. لو فيها حاجة مش شغّالة، غيّرها بدل ما تفضل تتأجّل.` });
+  return out;
+}
+
 /* ---------- عرض الجلسة الحالية ---------- */
 function viewToday() {
   const c = ensureCur(), D = sessByKey(c.k), wk = S.week;
@@ -254,12 +273,22 @@ function viewToday() {
         `<span class="step ${i === S.pos ? 'on' : ''} ${i < S.pos ? 'past' : ''}" title="${esc(sessByKey(k).title)}"></span>`).join('')}</div>
     </div>
     ${wkBar(wk)}
-    ${D.type === 'recov' ? '' : progRow(D, wk)}
+    ${D.type === 'recov' && !D.absEx ? '' : progRow(D, wk)}
   </div>`;
 
+  cycleWarnings().forEach(w => h += `<div class="note">${esc(w.m)}</div>`);
   (D.notes || []).forEach((n, i) => h += `<div class="note ${i ? 'g' : ''}">${esc(n)}</div>`);
 
-  if (D.type === 'recov') return h + viewRecov(D, wk) + finishCard(D);
+  if (D.type === 'recov') {
+    let r = h + viewRecov(D, wk);
+    if (D.absEx) {
+      const plan = sessionPlan(D.k, wk);
+      r += `<div class="sect"><h2>٢ · ${esc(D.absTitle)}</h2></div><div class="card">`;
+      plan.filter(p => p.kind === 'abs').forEach((p, i) => r += exCard(p, i + 1, wk));
+      r += `</div>`;
+    }
+    return r + finishCard(D);
+  }
 
   const plan = sessionPlan(D.k, wk);
 
@@ -305,7 +334,7 @@ function viewToday() {
 
 function finishCard(D) {
   const c = ensureCur();
-  const n = D.absEx ? '٥' : D.cardio ? '٤' : D.type === 'recov' ? '٢' : '٣';
+  const n = D.type === 'recov' ? (D.absEx ? '٣' : '٢') : D.absEx ? '٥' : D.cardio ? '٤' : '٣';
   return `<div class="sect"><h2>${n} · إقفال الجلسة</h2></div>
   <div class="card card-p">
     <div class="f" style="margin-bottom:9px">
@@ -456,7 +485,7 @@ function viewRecov(D, wk) {
     <div class="note g">اللي فعلًا بيسرّع الاستشفاء بالترتيب: النوم ٧–٨ ساعات · البروتين الكافي · المشي الخفيف · إدارة الضغط.</div>
   </div>`;
 
-  h += `<div class="sect"><h2>كل الفترات على ٦ أسابيع</h2></div><div class="card scroll"><table class="tbl">
+  if (D.intervals) h += `<div class="sect"><h2>كل الفترات على ٦ أسابيع</h2></div><div class="card scroll"><table class="tbl">
     <tr><th>الأسبوع</th><th>البروتوكول</th><th>الراحة</th><th>الشدة</th></tr>
     ${INTERVALS.map(r => `<tr class="${r.w === wk ? 'hi' : ''}"><td>${r.w}</td><td>${esc(r.p)}</td><td>${esc(r.rest)}</td><td>${esc(r.int)}</td></tr>`).join('')}
   </table></div>`;
@@ -516,6 +545,7 @@ function viewProg() {
     if (!inWeek(r)) return;
     Object.keys(r.ex || {}).forEach(id => {
       const ex = EX[id]; if (!ex) return;
+      if (ex.nc) return;                       /* تسخين ورقبة وقصبة — مش محسوبة */
       const n = r.ex[id].sets.filter(s => s && (s.d || +s.r > 0)).length;
       if (n) vol[ex.m[0]] = (vol[ex.m[0]] || 0) + n;
     });
