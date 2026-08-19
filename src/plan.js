@@ -561,7 +561,7 @@ const EX = {
           'خطوات ثابتة والبطن مشدودة']
   },
   'cable-crunch-b': {
-    n: 'بطن بالكابل', im: ['abs3', 3], s: 3, lo: 12, hi: 15, inc: 1.5, r: 60,
+    n: 'بطن بالكابل — عدات أعلى', im: ['abs3', 3], s: 3, lo: 12, hi: 15, inc: 1.5, r: 60,
     m: ['abs'],
     cue: ['لفّ من العمود الفقري والحوض ثابت',
           'ازفر بالكامل في الآخر',
@@ -598,7 +598,7 @@ const WARM_EXTRA = {
 
 const SESSIONS = [
   {
-    k: 'pushA', title: 'Push A', tag: 'ثقيل', type: 'push',
+    k: 'pushA', heavy: true, title: 'Push A', tag: 'ثقيل', type: 'push',
     sub: 'صدر · كتف أمامي وجانبي · ترايسبس. أعلى شدّة في الدورة.',
     dur: 70,
     warm: ['ext-rot'],
@@ -608,7 +608,7 @@ const SESSIONS = [
     notes: ['الترتيب: تسخين ← الحديد ← إرجومتر ٢٠ دقيقة هادي. مفيش بطن في الجلسة دي.']
   },
   {
-    k: 'pullA', title: 'Pull A', tag: 'ثقيل', type: 'pull',
+    k: 'pullA', heavy: true, title: 'Pull A', tag: 'ثقيل', type: 'pull',
     sub: 'ظهر · كتف خلفي · بايسبس · قبضة.',
     dur: 60,
     warm: [],
@@ -617,11 +617,11 @@ const SESSIONS = [
     notes: ['مفيش تجديف على الإرجومتر في الجلسة دي — الظهر والقبضة اتضربوا بالفعل.']
   },
   {
-    k: 'legsA', title: 'Legs A', tag: 'ثقيل', type: 'legs',
+    k: 'legsA', heavy: true, title: 'Legs A', tag: 'ثقيل', type: 'legs',
     sub: 'رجل أمامي وخلفي · سمانة · قصبة.',
     dur: 65,
     warm: [],
-    ex: ['back-squat', 'rdl-bar', 'leg-press', 'bulgarian', 'lying-leg-curl',
+    ex: ['back-squat', 'rdl-bar', 'leg-press', 'bulgarian',
          'standing-calf', 'tibialis'],
     notes: ['صفر تجديف في الجلسة دي — الجلسة اللي بعدها فترات.',
             'الرفعة الرومانية هي أقرب تمرين لحركة التجديف: دفع بالرجل وانثناء من الحوض.']

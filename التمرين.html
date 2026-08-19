@@ -860,7 +860,7 @@ const EX = {
           'خطوات ثابتة والبطن مشدودة']
   },
   'cable-crunch-b': {
-    n: 'بطن بالكابل', im: ['abs3', 3], s: 3, lo: 12, hi: 15, inc: 1.5, r: 60,
+    n: 'بطن بالكابل — عدات أعلى', im: ['abs3', 3], s: 3, lo: 12, hi: 15, inc: 1.5, r: 60,
     m: ['abs'],
     cue: ['لفّ من العمود الفقري والحوض ثابت',
           'ازفر بالكامل في الآخر',
@@ -897,7 +897,7 @@ const WARM_EXTRA = {
 
 const SESSIONS = [
   {
-    k: 'pushA', title: 'Push A', tag: 'ثقيل', type: 'push',
+    k: 'pushA', heavy: true, title: 'Push A', tag: 'ثقيل', type: 'push',
     sub: 'صدر · كتف أمامي وجانبي · ترايسبس. أعلى شدّة في الدورة.',
     dur: 70,
     warm: ['ext-rot'],
@@ -907,7 +907,7 @@ const SESSIONS = [
     notes: ['الترتيب: تسخين ← الحديد ← إرجومتر ٢٠ دقيقة هادي. مفيش بطن في الجلسة دي.']
   },
   {
-    k: 'pullA', title: 'Pull A', tag: 'ثقيل', type: 'pull',
+    k: 'pullA', heavy: true, title: 'Pull A', tag: 'ثقيل', type: 'pull',
     sub: 'ظهر · كتف خلفي · بايسبس · قبضة.',
     dur: 60,
     warm: [],
@@ -916,11 +916,11 @@ const SESSIONS = [
     notes: ['مفيش تجديف على الإرجومتر في الجلسة دي — الظهر والقبضة اتضربوا بالفعل.']
   },
   {
-    k: 'legsA', title: 'Legs A', tag: 'ثقيل', type: 'legs',
+    k: 'legsA', heavy: true, title: 'Legs A', tag: 'ثقيل', type: 'legs',
     sub: 'رجل أمامي وخلفي · سمانة · قصبة.',
     dur: 65,
     warm: [],
-    ex: ['back-squat', 'rdl-bar', 'leg-press', 'bulgarian', 'lying-leg-curl',
+    ex: ['back-squat', 'rdl-bar', 'leg-press', 'bulgarian',
          'standing-calf', 'tibialis'],
     notes: ['صفر تجديف في الجلسة دي — الجلسة اللي بعدها فترات.',
             'الرفعة الرومانية هي أقرب تمرين لحركة التجديف: دفع بالرجل وانثناء من الحوض.']
@@ -1205,33 +1205,46 @@ function baseVolume() {
 }
 
 /* توزيع المجموعات الزيادة — مرة واحدة لكل أسبوع على الدورة كلها.
-   كل عضلة بتاخد بالظبط الفرق بين هدف الأسبوع وقاعدتها، موزّع بالتناوب
-   على تمارينها عبر الجلسات. كده الجدول هو اللي بيحكم، مش ترتيب التمارين
-   ولا سقف ثابت للجلسة — وكل عضلة بتوصل هدفها بالضبط. */
+
+   قاعدتين:
+   ١) كل عضلة بتاخد بالظبط فرقها عن هدف الأسبوع.
+   ٢) الجلسات الثقيلة (A) سقفها +٢ مجموعة فوق أسبوع ١ — التقدّم فيها
+      بالوزن مش بعدد المجموعات. الباقي بيروح لجلسات الحجم (B)،
+      لأن تكلفة المجموعة في مدى ١٢–١٥ أقل بكتير منها في ٤–٦. */
+const HEAVY_CAP = 2;
 const _bonusCache = {};
 function weekBonus(week) {
   if (_bonusCache[week]) return _bonusCache[week];
   const W = WEEKS[week - 1], bonus = {};
   if (W.extra <= 0) return (_bonusCache[week] = bonus);
 
-  /* تمارين كل عضلة عبر الدورة، بالترتيب */
+  /* تمارين كل عضلة: جلسات الحجم الأول، وبعدين الثقيلة */
   const slots = {};
   ORDER.forEach(k => {
     const D = sessByKey(k);
     [].concat(D.ex || [], D.absEx || []).forEach((id, i) => {
       const e = EX[id]; if (!e || e.nc || !VOLUME_TARGET[e.m[0]]) return;
-      (slots[e.m[0]] = slots[e.m[0]] || []).push(k + '|' + i);
+      (slots[e.m[0]] = slots[e.m[0]] || []).push({ key: k + '|' + i, sess: k, heavy: !!D.heavy });
     });
   });
+  Object.values(slots).forEach(a => a.sort((x, y) => (x.heavy ? 1 : 0) - (y.heavy ? 1 : 0)));
 
-  const base = baseVolume();
+  const base = baseVolume(), added = {};
   Object.keys(VOLUME_TARGET).forEach(m => {
-    const need = VOLUME_TARGET[m][week - 1] - (base[m] || 0);
+    let need = VOLUME_TARGET[m][week - 1] - (base[m] || 0);
     const list = slots[m] || [];
     if (need <= 0 || !list.length) return;
-    for (let n = 0; n < need; n++) {
-      const key = list[n % list.length];
-      bonus[key] = (bonus[key] || 0) + 1;
+    let n = 0, guard = 0;
+    while (need > 0 && guard++ < 400) {
+      const sl = list[n % list.length]; n++;
+      if (sl.heavy && (added[sl.sess] || 0) >= HEAVY_CAP) {
+        /* لو كل الخانات المتاحة للعضلة دي اتقفلت، نسيب الباقي */
+        if (list.every(x => x.heavy && (added[x.sess] || 0) >= HEAVY_CAP)) break;
+        continue;
+      }
+      bonus[sl.key] = (bonus[sl.key] || 0) + 1;
+      added[sl.sess] = (added[sl.sess] || 0) + 1;
+      need--;
     }
   });
   return (_bonusCache[week] = bonus);
@@ -1255,6 +1268,17 @@ function sessionPlan(k, week) {
     planList(D, main, week, 'main', 0),
     planList(D, abs, week, 'abs', main.length)
   );
+}
+
+
+/* المدة المقدَّرة للأسبوع الحالي: تسخين + (مجموعات × (راحة + شغل)) + كارديو */
+function sessionMinutes(k, week) {
+  const D = sessByKey(k);
+  let sec = 0;
+  sessionPlan(k, week).forEach(p => { sec += p.sets * (EX[p.id].r + 40); });
+  const warm = (D.ex || []).length ? 8 : 3;
+  const cardio = D.cardio ? D.cardio.min : D.intervals ? 40 : D.steady ? 30 : 0;
+  return Math.round((sec / 60 + warm + cardio) / 5) * 5;
 }
 
 /* ---------- تاريخ التمرين ---------- */
@@ -1414,7 +1438,7 @@ function viewToday() {
       <h2>${esc(D.title)}<span class="tg">${esc(D.tag)}</span></h2>
       <p>${esc(D.sub)}</p>
       <div class="chips">
-        <span class="chip g">المدة ${L(D.dur)} دقيقة</span>
+        <span class="chip g">المدة ~${L(sessionMinutes(D.k, wk))} دقيقة</span>
         ${D.absEx ? `<span class="chip">بطن ${L(D.absEx.length)} تمارين</span>` : ''}
         ${D.cardio ? `<span class="chip">إرجومتر ${L(D.cardio.min)} د</span>` : ''}
       </div>
@@ -1654,7 +1678,7 @@ function viewPlan() {
       <span class="num" style="background:${i === S.pos ? 'var(--navy)' : D.type === 'recov' ? '#fdf3e0' : 'var(--bg)'};color:${i === S.pos ? '#fff' : D.type === 'recov' ? 'var(--warn)' : 'var(--navy)'}">${i + 1}</span>
       <span class="exmeta">
         <h3>${esc(D.title)} ${i === S.pos ? '<span class="tag" style="background:var(--navy);color:#fff">دلوقتي</span>' : ''}</h3>
-        <div class="sub">${n ? L(n) + ' تمرين · ' : ''}${L(D.dur)} دقيقة${D.absEx ? ' · بطن ' + L(D.absEx.length) : ''}${D.cardio ? ' · إرجومتر ' + L(D.cardio.min) + ' د' : ''}</div>
+        <div class="sub">${n ? L(n) + ' تمرين · ' : ''}~${L(sessionMinutes(D.k, S.week))} دقيقة${D.absEx ? ' · بطن ' + L(D.absEx.length) : ''}${D.cardio ? ' · إرجومتر ' + L(D.cardio.min) + ' د' : ''}</div>
       </span>
       <span class="tag">${esc(D.tag)}</span>
     </button>`;
